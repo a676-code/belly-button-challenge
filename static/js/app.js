@@ -35,7 +35,7 @@ function init() {
         // IOW, we want the default menu to display the first name in the list
         barPlot(first);
         bubblePlot(first);
-        metadata(first);
+        demographicInfo(first);
     });
 }
 
@@ -54,8 +54,8 @@ function barPlot(sample) {
 
         // slicing the ten values and putting them in descending order
         let xticks = sample_values.slice(0,10);
-        let yticks = otu_labels.slice(0,10);
-        let labels = otu_ids.slice(0,10);
+        let yticks = otu_ids.slice(0,10).map(item => `OTU ${item}`);
+        let labels = otu_labels.slice(0,10);
 
         let trace1 = {
             x:xticks.reverse(),
@@ -115,32 +115,33 @@ function bubblePlot(sample) {
     });
 }
 
-function metadata(sample) {
+function demographicInfo(sample) {
     d3.json(samples_url).then((data) => {
-        let metadata = data.metadata;
+        let demographicInfo = data.metadata;
 
-        let value = metadata.filter(item => item.id == sample);
+        let value = demographicInfo.filter(item => item.id == sample);
 
         console.log("value:", value)
-        let valueMetadata = value[0];
+        let valueDemographicInfo = value[0];
         
         // clear the div so that it's ready for the new info
-        d3.select("#sample-metadata").html("");
+        d3.select("#sample-demographicInfo").html("");
 
         // FIX
-        console.log("VMD:", valueMetadata);
+        console.log("VMD:", valueDemographicInfo);
 
         // https://stackoverflow.com/questions/54651873/how-to-map-key-value-pairs-of-a-map-in-javascript
-        Object.entries(valueMetadata).forEach(([key,value]) => {
-            // append each key, value pair div that corresponds to id="sample-metadata"
-            d3.select("#sample-metadata").append("p").text(`${key}: ${value}`);
+        Object.entries(valueDemographicInfo).forEach(([key,value]) => {
+            // append each key, value pair div that corresponds to id="sample-demographicInfo"
+            d3.select("#sample-demographicInfo").append("p").text(`${key}: ${value}`);
         });
     });
 }
 
 function optionChanged(sample) {
-    // rerunning these functions so that the metadata and plots get updated
-    metadata(sample);
+    // rerunning these functions so that the demographicInfo and plots get updated
+    demographicInfo(sample);
+
     barPlot(sample);
     bubblePlot(sample);
 }
