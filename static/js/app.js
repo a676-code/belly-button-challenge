@@ -40,6 +40,9 @@ function init() {
 }
 
 function barPlot(sample) {
+
+    console.log("BAR sample:",sample);
+
     d3.json(samples_url).then((data) => {
         let samples = data.samples;
 
@@ -71,7 +74,7 @@ function barPlot(sample) {
 
         traceData = [trace1]
 
-        Plotly.newPlot("bar", traceData, layout)
+        Plotly.newPlot("bar", traceData, layout);
     });
 };
 
@@ -117,31 +120,32 @@ function bubblePlot(sample) {
 
 function demographicInfo(sample) {
     d3.json(samples_url).then((data) => {
-        let demographicInfo = data.metadata;
+        let metadata = data.metadata;
 
-        let value = demographicInfo.filter(item => item.id == sample);
+        let value = metadata.filter(item => item.id == sample);
 
         console.log("value:", value)
-        let valueDemographicInfo = value[0];
+        let valueMetadata = value[0];
         
         // clear the div so that it's ready for the new info
-        d3.select("#sample-demographicInfo").html("");
+        d3.select("#sample-metadata").html("");
 
         // FIX
-        console.log("VMD:", valueDemographicInfo);
+        console.log("VMD:", valueMetadata);
 
         // https://stackoverflow.com/questions/54651873/how-to-map-key-value-pairs-of-a-map-in-javascript
-        Object.entries(valueDemographicInfo).forEach(([key,value]) => {
-            // append each key, value pair div that corresponds to id="sample-demographicInfo"
-            d3.select("#sample-demographicInfo").append("p").text(`${key}: ${value}`);
+        Object.entries(valueMetadata).forEach(([key,value]) => {
+            // append each key, value pair div that corresponds to id="sample-metadata"
+            d3.select("#sample-metadata").append("p").text(`${key}: ${value}`);
         });
     });
 }
 
 function optionChanged(sample) {
-    // rerunning these functions so that the demographicInfo and plots get updated
-    demographicInfo(sample);
 
+    console.log("next value:", sample);
+    // rerunning these functions so that the metadata and plots get updated
+    demographicInfo(sample);
     barPlot(sample);
     bubblePlot(sample);
 }
