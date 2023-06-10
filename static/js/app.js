@@ -43,31 +43,24 @@ function barPlot(sample) {
     d3.json(samples_url).then((data) => {
         let samples = data.samples;
 
-        // filtering for results that match the sample
-        function matchSample (sample) {
-            console.log("SAMPLE", sample)
-            return samples.id == sample;
-        }
-        let matchedSamples = samples.filter(matchSample)
+        // filtering so that the id matches that of the sample
+        let matchedSamples = samples.filter((item) => {
+            return item.id = sample;
+        });
 
-        sample_values = matchedSamples.sample_values;
-        otu_ids = matchedSamples.otu_ids;
-        otu_labels = matchedSamples.otu_labels;
-
-        console.log("ids:", otu_ids);
-        console.log("labels", otu_labels);
-        console.log("SV:", sample_values);
+        sample_values = matchedSamples[0].sample_values;
+        otu_ids = matchedSamples[0].otu_ids;
+        otu_labels = matchedSamples[0].otu_labels;
 
         // slicing the ten values and putting them in descending order
-        // FIX: doesn't like slice
-        let xticks = sample_values.slice(0,10).reverse();
-        let yticks = otu_ids.slice(0,10).reverse();
-        let lables = otu_labels.slice(0,10).reverse()
+        let xticks = sample_values.slice(0,10);
+        let yticks = otu_labels.slice(0,10);
+        let labels = otu_ids.slice(0,10);
 
         let trace1 = {
-            x:xticks,
-            y:yticks,
-            text:labels,
+            x:xticks.reverse(),
+            y:yticks.reverse(),
+            text:labels.reverse(),
             type:"bar",
             orientation: "h"
         };
@@ -76,62 +69,69 @@ function barPlot(sample) {
             title: "Top Ten OTUs"
         };
 
-        traceData = [trace]
+        traceData = [trace1]
 
         Plotly.newPlot("bar", traceData, layout)
     });
 };
 
 function bubblePlot(sample) {
-    let samples = data.samples;
+    d3.json(samples_url).then((data) => {
+        let samples = data.samples;
 
-    // filtering for results that match the sample
-    function matchSample (sample) {
-        return (something => something.id == sample);
-    }
-    matchedSamples = samples.filter(matchSample)
+        // filtering for results that match the sample
+        let matchedSamples = samples.filter((item) => {
+            return item.id = sample;
+        });
 
-    sample_values = matchedSamples.sample_values;
-    otu_ids = matchedSamples.otu_ids;
-    otu_labels = matchedSamples.otu_labels;
+        sample_values = matchedSamples[0].sample_values;
+        otu_ids = matchedSamples[0].otu_ids;
+        otu_labels = matchedSamples[0].otu_labels;
 
-    console.log("ids:", otu_ids);
-    console.log("labels", otu_labels);
-    console.log("SV:", sample_values);
+        let xticks = otu_ids;
+        let yticks = sample_values;
 
-    xticks = otu_ids;
-    yticks = sample_values;
+        let trace1 = {
+            x: xticks,
+            y: yticks,
+            text: otu_labels,
+            mode: "markers",
+            // https://plotly.com/javascript/bubble-charts/
+            // https://plotly.com/javascript/colorscales/
+            marker: {
+                size: sample_values,
+                color: otu_ids,
+                colorscale: "Earth"
+            }
+        }
 
-    trace1 = {
-        x: xticks,
-        y: yticks,
-        text: otu_labels,
-    }
+        traceData = [trace1]
 
-    traceData = [trace1]
+        layout = {
+            title: "OTUs"
+        }
 
-    layout = {
-        title: "OTUs"
-    }
-
-    Plotly.newPlot("bubble", traceData, layout)
+        Plotly.newPlot("bubble", traceData, layout)
+    });
 }
 
 function metadata(sample) {
     d3.json(samples_url).then((data) => {
         let metadata = data.metadata;
 
-        let value = metadata.filter(result => result.id == sample);
+        let value = metadata.filter(item => item.id == sample);
 
         console.log("value:", value)
         let valueMetadata = value[0];
-        console.log("value 0:", value[0])
         
-        // clear the table so that it's ready for the new info
+        // clear the div so that it's ready for the new info
         d3.select("#sample-metadata").html("");
 
         // FIX
-        valueMetadata.map((key,value) => {
+        console.log("VMD:", valueMetadata);
+
+        // https://stackoverflow.com/questions/54651873/how-to-map-key-value-pairs-of-a-map-in-javascript
+        Object.entries(valueMetadata).forEach(([key,value]) => {
             // append each key, value pair div that corresponds to id="sample-metadata"
             d3.select("#sample-metadata").append("p").text(`${key}: ${value}`);
         });
@@ -145,4 +145,5 @@ function optionChanged(sample) {
     bubblePlot(sample);
 }
 
+// running the init function to initialize the aspects of the page
 init();
