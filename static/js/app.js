@@ -3,19 +3,10 @@ const samples_url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-cl
 // getting the data from the url
 d3.json(samples_url).then(function(data) {
     console.log("Data: ", data.samples);
-
-    let samples = data.samples;
-    let sample_values = samples.sample_values;
-    let ids = samples.otu_ids;
-    let labels = samples.otu_labels;
-
-    console.log("samples: ", samples);
-    console.log("sample values: ", sample_values);
-    console.log("ids: ", ids);
-    console.log("labels: ", labels);
 });
 
 function init() {
+    console.log("INIT")
     let menu = d3.select("#selDataset"); 
 
     // We need to append the options to the dropdown menu
@@ -24,20 +15,16 @@ function init() {
         let names = data.names;
 
         names.map((name) => {
-            menu.append("option")
-            .text(name)
-            .property("value", name);
+            menu.append("option").text(name).property("value", name);
         });
 
-        // logging this gives 940, the first id
-        first = names[0];
-
-        // IOW, we want the default menu to display the first name in the list
-        barPlot(first);
-        bubblePlot(first);
-        demographicInfo(first);
+        // logging names[0] gives 940, the first id
+        // In other words, we want the default menu to display the first name in the list
+        demographicInfo(names[0]);
+        barPlot(names[0]);
+        bubblePlot(names[0]);
     });
-}
+};
 
 function barPlot(sample) {
 
@@ -116,7 +103,7 @@ function bubblePlot(sample) {
 
         Plotly.newPlot("bubble", traceData, layout)
     });
-}
+};
 
 function demographicInfo(sample) {
     d3.json(samples_url).then((data) => {
@@ -125,22 +112,19 @@ function demographicInfo(sample) {
         let value = metadata.filter(item => item.id == sample);
 
         console.log("value:", value)
-        let valueMetadata = value[0];
         
         // clear the div so that it's ready for the new info
         d3.select("#sample-metadata").html("");
 
-        // FIX
-        console.log("VMD:", valueMetadata);
-
         // https://stackoverflow.com/questions/54651873/how-to-map-key-value-pairs-of-a-map-in-javascript
-        Object.entries(valueMetadata).forEach(([key,value]) => {
-            // append each key, value pair div that corresponds to id="sample-metadata"
+        Object.entries(value[0]).map(([key,value]) => {
+            // append each key, value pair to the div that corresponds to id="sample-metadata"
             d3.select("#sample-metadata").append("p").text(`${key}: ${value}`);
         });
     });
-}
+};
 
+// FIX: doesn't update when dropdown menu option changes
 function optionChanged(sample) {
 
     console.log("next value:", sample);
@@ -148,7 +132,7 @@ function optionChanged(sample) {
     demographicInfo(sample);
     barPlot(sample);
     bubblePlot(sample);
-}
+};
 
 // running the init function to initialize the aspects of the page
 init();
