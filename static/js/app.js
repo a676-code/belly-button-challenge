@@ -1,12 +1,11 @@
 const samples_url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json"
 
-// getting the data from the url
+// getting the data from the url and logging it
 d3.json(samples_url).then(function(data) {
     console.log("Data: ", data.samples);
 });
 
 function init() {
-    console.log("INIT")
     let menu = d3.select("#selDataset"); 
 
     // We need to append the options to the dropdown menu
@@ -20,6 +19,9 @@ function init() {
 
         // logging names[0] gives 940, the first id
         // In other words, we want the default menu to display the first name in the list
+
+        console.log("names 0:", names[0])
+
         demographicInfo(names[0]);
         barPlot(names[0]);
         bubblePlot(names[0]);
@@ -27,15 +29,12 @@ function init() {
 };
 
 function barPlot(sample) {
-
-    console.log("BAR sample:",sample);
-
     d3.json(samples_url).then((data) => {
         let samples = data.samples;
 
         // filtering so that the id matches that of the sample
         let matchedSamples = samples.filter((item) => {
-            return item.id = sample;
+            return item.id == sample;
         });
 
         sample_values = matchedSamples[0].sample_values;
@@ -71,7 +70,7 @@ function bubblePlot(sample) {
 
         // filtering for results that match the sample
         let matchedSamples = samples.filter((item) => {
-            return item.id = sample;
+            return item.id == sample;
         });
 
         sample_values = matchedSamples[0].sample_values;
@@ -124,7 +123,6 @@ function demographicInfo(sample) {
     });
 };
 
-// FIX: doesn't update when dropdown menu option changes
 function optionChanged(sample) {
 
     console.log("next value:", sample);
