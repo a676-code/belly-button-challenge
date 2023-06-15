@@ -2,7 +2,7 @@ const samples_url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-cl
 
 // getting the data from the url and logging it
 d3.json(samples_url).then(function(data) {
-    console.log("Data: ", data.samples);
+    console.log("Data: ", data);
 });
 
 function init() {
@@ -19,8 +19,6 @@ function init() {
 
         // logging names[0] gives 940, the first id
         // In other words, we want the default menu to display the first name in the list
-
-        console.log("names 0:", names[0])
 
         demographicInfo(names[0]);
         barPlot(names[0]);
